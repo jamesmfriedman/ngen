@@ -1,0 +1,21 @@
+{
+  "name": "ngen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ngen.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "change-case": "^2.3.0",
+    "ejs": "^2.3.4",
+    "merge": "^1.2.0",
+    "prompt": "^0.2.14",
+    "wrench": "^1.5.8"
+  },
+  "bin": {
+    "ngen": "ngen.js"
+  }
+}
