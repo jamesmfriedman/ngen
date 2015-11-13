@@ -7,14 +7,18 @@ Has Angular generators for now, but its technically agnostic.
 Usage
 ------
 From the command line
+```bash
 $ ngen generatorType componentName
-
+```
+```bash
 $ ngen directive mainNav
+```
 
 Sample Config
 -------------
 Make a file called ngen.config.js in the main directory of your project
 
+```javascript
 module.exports = {
 	'service' : {
 		path: '/src/services' //places all files created by this generator in /src/services
@@ -29,4 +33,4 @@ module.exports = {
 		}
 	}
 }
-
+```
