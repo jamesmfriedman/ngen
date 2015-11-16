@@ -14,7 +14,7 @@ $ npm install ngen-ng
 ```
 The ngen-ng Angular generator is available here: https://github.com/jamesmfriedman/ngen-ng
 
-After nGen is installed, at an ngen.config.js file to the root of your project. This is where you can define per project configuration, and where you add generators to your project. Here is the simplest version of the config, with one generator installed:
+After nGen is installed, add an ngen.config.js file to the root of your project. This is where you can define per project configuration, and where you add generators to your project. Here is the simplest version of the config, with one generator installed:
 
 ```javascript
 module.exports = {
