@@ -14,7 +14,7 @@ $ npm install ngen-ng
 ```
 The ngen-ng Angular generator is available here: https://github.com/jamesmfriedman/ngen-ng
 
-After ngen is installed, at an ngen.config.js file to the root of your project. This is where you can define per project configuration, and where you add generators to your project. Here is the simplest version of the config, with one generator installed:
+After nGen is installed, at an ngen.config.js file to the root of your project. This is where you can define per project configuration, and where you add generators to your project. Here is the simplest version of the config, with one generator installed:
 
 ```javascript
 module.exports = {
@@ -27,7 +27,7 @@ module.exports = {
 ```
 
 ## How it works
-Ngen takes a generator spec (a directory) and copies all of its contents to the appropriate locations in your project. The files and file names are processed by Ngen with a configuration object containing templated variables and names. Example Spec and example [name].js file:
+nGen takes a generator spec (a directory) and copies all of its contents to the appropriate locations in your project. The files and file names are processed by nGen with a configuration object containing templated variables and names. Example Spec and example [name].js file:
 ```
 // example spec
 +-- directive
@@ -70,7 +70,7 @@ angular.module('app').directive('helloWorld', function() {
 ```
 
 ## Usage
-Ngen is a command line tool that takes in a set of parameters.
+nGen is a command line tool that takes in a set of parameters.
 ```shell
 $ ngen optionalPackageName:generator componentName
 ```
@@ -83,15 +83,15 @@ This will generate a new directive using the 'directive' generator and give it a
 $ ngen directive mainNav
 ```
 ### Configure to Your Heart's Desire
-When Ngen runs, it builds a configuration object that gets passed into all of the generator's files as template variables. Configuration variables are honored in the following order:
+When nGen runs, it builds a configuration object that gets passed into all of the generator's files as template variables. Configuration variables are honored in the following order:
 
 - any inline command line args
 - the project's ngen.config.js file
 - the generator's ngen.config.js file
 - the generator package's ngen.config.js file
-- the standard Ngen config.
+- the standard nGen config.
 
-When running Ngen, the configuration object that gets passed to your templates will be logged in your terminal so theres no guessing as to what values are getting processed. In addition to the templates, file names can use any variables present in your configuration using dot notation. Example, a file named [module].js will be replaced with a configuration variable {'module': 'foo'}. The name you pass into the command line will be available in the name property converted into camelCase, PascalCase, snake_case, param-case, CONSTANT_CASE, and dot.case. In your template just access it accordingly (name.camelCase, name.pascalCase). Again, the same options are available to your file names, so you can name your files or directories things like [name]/[name.camelCase].js.
+When running nGen, the configuration object that gets passed to your templates will be logged in your terminal so theres no guessing as to what values are getting processed. In addition to the templates, file names can use any variables present in your configuration using dot notation. Example, a file named [module].js will be replaced with a configuration variable {'module': 'foo'}. The name you pass into the command line will be available in the name property converted into camelCase, PascalCase, snake_case, param-case, CONSTANT_CASE, and dot.case. In your template just access it accordingly (name.camelCase, name.pascalCase). Again, the same options are available to your file names, so you can name your files or directories things like [name]/[name.camelCase].js.
 
 ### Sample Config
 Make a file called `ngen.config.js` in the main directory of your project. The only required configuration parameter is _.generators.
@@ -99,7 +99,7 @@ Make a file called `ngen.config.js` in the main directory of your project. The o
 ```javascript
 module.exports = {
 	
-	- : { // the underscore is for global Ngen configuration options, here so they don't conflict with your params
+	- : { // the underscore is for global nGen configuration options, here so they don't conflict with your params
 		generators: [require('ngen-ng')] // require as many generator packages as your want.
 		ignore: ['.DS_Store', 'ngen.config.js'] // array of filenames to ignore when copying scaffolding. This is the default.
 	},
@@ -149,7 +149,7 @@ $ ngen directive helloWorld --module foo --publicPath /static/
 ```
 
 ## Creating your own Generators.
-Since no one can know exactly how you do things, you're probably going to want to make your own generators. Luckily it's as easy as running ngen.
+Since no one can know exactly how you do things, you're probably going to want to make your own generators. Luckily it's as easy as running nGen.
 
 1. Make sure `ngen` is installed and available
 2. In your project's root, run `ngen newGenerator yourGeneratorPackageName`
