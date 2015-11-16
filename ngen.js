@@ -10,20 +10,20 @@ var merge = require('merge');
 var prompt = require('prompt');
 var argv = require('minimist')(process.argv.slice(2));
 
-var Generator = function(generatorPackage, generatorType, generatorName, extraPath, inlineConfig) {
+
+var Generator = function(generatorPackage, generatorType, generatorName, extraPath, userConfig, inlineConfig) {
 	var that = this;
 	this.package = generatorPackage;
-	this.packageDir = path.join(__dirname, 'generators', this.package); 
 	this.type = generatorType;
 	this.name = generatorName;
 	this.extraPath = null
 	this.config = null;
-	this.spec = path.join(this.packageDir, this.type);
+	this.spec = path.join(this.package.dir, this.type);
 	this.cwd = process.cwd();
 
 	this.init = function() {
 		this.config = this.buildConfig();
-		this.extraPath = (this.config.createDir ? this.name : '') + (extraPath ? path.sep + extraPath : '');
+		this.extraPath = (this.config._.createDir ? this.name : '') + (extraPath ? path.sep + extraPath : '');
 	};
 
 	this.generate = function() {
@@ -130,7 +130,7 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		var files = wrench.readdirSyncRecursive(this.spec);
 
 		return files.filter(function(f){
-			return that.config.ignore.indexOf(path.basename(f)) == -1;
+			return that.config._.ignore.indexOf(path.basename(f)) == -1;
 		});
 	};
 
@@ -186,9 +186,8 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 	
 	this.buildConfig = function() {
 		// create our config, merge it with the user config for this specific type
-		var userConfigPath = path.join(process.cwd(), 'ngen.config.js');
-		var packageConfigPath = path.join(this.packageDir, 'ngen.config.js');
-		var generaterConfigPath = path.join(this.spec, 'ngen.config.js');
+		var packageConfigPath = path.join(this.package.dir, 'ngen.config.js');
+		var generaterConfigPath = path.join(this.spec, '../..', 'ngen.config.js');
 		var nameCases = [
 			'', //needed for the raw name
 			'camelCase', 
@@ -202,28 +201,20 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		inlineConfig = inlineConfig || {};
 
 		var userGeneratorConfig = {};
-		if (fs.existsSync(userConfigPath)) {
-			var userConfig = require(userConfigPath);
-
-			if ('*' in userConfig) {
-				userGeneratorConfig = merge.recursive(true, userGeneratorConfig, userConfig['*']);
-			}
-
-			if (this.package in userConfig) {
-
-				// get the all for this package
-				if ('*' in userConfig[this.package]) {
-					userGeneratorConfig = merge.recursive(true, userGeneratorConfig, userConfig[this.package]['*']);
-				}
-
-				// get the generator config
-				userGeneratorConfig = merge.recursive(true, userGeneratorConfig, (this.type in userConfig[this.package] ? userConfig[this.package][this.type] : {} ));
-			}
-
-			if (userConfig) {
-				
-			}
+		if ('*' in userConfig) {
+			userGeneratorConfig = merge.recursive(true, userGeneratorConfig, userConfig['*']);
 		}
+
+		if (this.package.name in userConfig) {
+			// get the all for this package
+			if ('*' in userConfig[this.package.name]) {
+				userGeneratorConfig = merge.recursive(true, userGeneratorConfig, userConfig[this.package.name]['*']);
+			}
+
+			// get the generator config
+			userGeneratorConfig = merge.recursive(true, userGeneratorConfig, (this.type in userConfig[this.package.name] ? userConfig[this.package.name][this.type] : {} ));
+		}
+		
 		
 		var generatorConfig = {};
 		if (fs.existsSync(generaterConfigPath)) {
@@ -236,8 +227,10 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		}
 
 		var standardConfig = {
-			ignore: ['ngen.config.js', '.DS_Store'],
-			createDir: true,
+			'_' : {
+				ignore: ['ngen.config.js', '.DS_Store'],
+				createDir: true,	
+			},
 			name: {}
 		};
 
@@ -261,17 +254,98 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 	this.init();	
 };
 
+var Package = function(dir, name) {
+	var that = this;
+	this.name = name || path.basename(dir);
+	this.dir = path.join(dir, 'generators');
+
+	this.generators = fs.readdirSync(this.dir).filter(function(f){
+		if (fs.statSync(path.join(that.dir, f)).isDirectory()) {
+			return f;
+		}
+	});
+};
+
+var UserConfig = function() {
+	var userConfigPath = path.join(process.cwd(), 'ngen.config.js');
+	var userConfig = {};
+
+	if (fs.existsSync(userConfigPath)) {
+		userConfig = require(userConfigPath);
+	}
+
+	return userConfig;
+};
+
 function init() {
-	var generatorPackage = 'angular';
+
+	// some base args from the command line
 	var generatorType = argv._[0];
 	var generatorName = argv._[1].split(path.sep).pop();
 	var extraPath = argv._[1].split(path.sep).length > 1 ? path.normalize(argv._[1].split(path.sep).slice(0, -1).join(path.sep)) : '';
+	var chosenPackage = null;
+
+	// split apart the generator type for package:generator format. Example angular:directive.
+	var parts = generatorType.split(':');
+	if (parts.length > 1) {
+		chosenPackage = parts[0];
+		generatorType = parts[1];
+	}
+	
+	// process some configuration
+	var userConfig = new UserConfig();
 	var commandLineConfig = require('minimist')(process.argv.slice(2)); // get another copy because we're going to edit this one
 	delete commandLineConfig._;
+	
+	// add user generators
+	var packages = userConfig._.generators.map(function(f){
+		return new Package(f.dir, f.name);
+	}).filter(function(p){
+		// filter out other packages if a chosen one was specified
+		if (chosenPackage !== null ? p.name == chosenPackage : true) {
+			return p.generators.indexOf(generatorType) != -1;
+		}
+	});	
 
-	var generator = new Generator(generatorPackage, generatorType, generatorName, extraPath, commandLineConfig);
-	generator.generate();
+	if (packages.length == 1) {		
+		var generatorPackage = packages[0];
+		var generator = new Generator(generatorPackage, generatorType, generatorName, extraPath, userConfig, commandLineConfig);
+		generator.generate();
 
+	} else if (packages.length > 1) {
+		prompt.start()
+		var promptText = '\n\nMultiple packages found containing generator "'+ generatorType +'":\n';
+		packages.forEach(function(p, i){
+			promptText += '\t' + (i + 1) + ') ' + p.name + '\n'
+		});
+
+		promptText += '\n\nPlease choose a package (1)';
+		
+		prompt.get([promptText], function(err, result){
+			var num = parseInt(result[promptText] || 1);
+			if (num <= 0 || num > promptText.length) {
+				num = 0;
+			} else {
+				num = num - 1;
+			}
+			
+			var generatorPackage = packages[num];
+			var generator = new Generator(generatorPackage, generatorType, generatorName, extraPath, userConfig, commandLineConfig);
+			generator.generate();
+			
+		});
+	} 
+
+	// not found
+	else {
+		console.log('');
+		console.log('No generators found for "' + generatorType + '"!');
+		console.log('Installed Generators:');
+		userConfig._.generators.forEach(function(p){
+			console.log('\t' + p.name + ': ' + p.dir);
+		});
+		console.log('');
+	}
 }
 
 init();
