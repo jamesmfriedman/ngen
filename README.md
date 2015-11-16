@@ -106,39 +106,46 @@ module.exports = {
 		ignore: ['.DS_Store', 'ngen.config.js'] // array of filenames to ignore when copying scaffolding. This is the default.
 	},
 	
-	// specific configuration for a genrator called 'template'
-	'template': {
-		_ : {
-			// just copies the files and does not contain a parent directory for the generator
-			createDir: false
-		}
-		// these are custom variables that will be exposed to any files in the generator when templating
-		staticPath: '/public/',
-		namespace: 'myapp-'
-	},
-	
-	//specific configuration for a generator called 'service'
-	'service' : { 
-		_ : {
-			path: '/src/services' //places all files created by this generator in /src/services
-		}
-		// these are custom variables that will be exposed to any files in the generator when templating
-		module: 'myapp.services'
-	},
-	
-	//specific configuration for a generator called 'directive'
-	'directive': {
-		_ : {
-			path: {
-				'*': '/src/components/[name.camelCase]/', // a catch all location for generated files
-				'.html': '/public/templates/', //transfers files with an html extension to this location
-				'.scss': '/src/sass/' //transfers files with an scss extenstion to this location.
+	// configuration for a generator package
+	ng: {
+		// specific configuration for a genrator called 'template'
+		template: {
+			_ : {
+				// just copies the files and does not contain a parent directory for the generator
+				createDir: false
 			}
-		}
+			// these are custom variables that will be exposed to any files in the generator when templating
+			staticPath: '/public/',
+			namespace: 'myapp-'
+		},
 		
-		// these are custom variables that will be exposed to any files in the generator when templating
-		foo: 'baz',
-		hello: 'world'
+		//specific configuration for a generator called 'service'
+		service : { 
+			_ : {
+				path: '/src/services' //places all files created by this generator in /src/services
+			}
+			// these are custom variables that will be exposed to any files in the generator when templating
+			module: 'myapp.services'
+		},
+		
+		//specific configuration for a generator called 'directive'
+		directive: {
+			_ : {
+				path: {
+					'*': '/src/components/[name.camelCase]/', // a catch all location for generated files
+					'.html': '/public/templates/', //transfers files with an html extension to this location
+					'.scss': '/src/sass/' //transfers files with an scss extenstion to this location.
+				}
+			}
+			
+			// these are custom variables that will be exposed to any files in the generator when templating
+			foo: 'baz',
+			hello: 'world'
+		},
+		
+		'*': {
+			// these options will be applied to all generators in this package
+		}
 	}
 }
 ```
