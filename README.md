@@ -1,18 +1,20 @@
-# Ngen
+# nGen
 
-Ngen is here to be better way to scaffold. Why? Other scaffolding generators are too opinionated or try to do too much. Even with a bunch of prebuilt generators, lets face it: you or your team do things your own way. Define your own reusable scaffolds and template individual files, whole directories, or even entire projects.
+nGen is here to be better way to scaffold. Why? Other scaffolding generators are too opinionated or try to do too much. Even with a bunch of prebuilt generators, lets face it: you or your team do things your own way. Define your own reusable scaffolds and template individual files, whole directories, or even entire projects.
 
 ## Installation
 
 Currently waiting to submit to npm, so for the time being:
 ```shell
-$ npm install git@github.com:jamesmfriedman/ngen.git
+$ npm install https://github.com/jamesmfriedman/ngen.git
 ```
 Generators are easy to make and add to your project. You'll probably want to define your own generators, but if you see one that meets your needs, install it to your project or global node_modules directory.
 ```shell
-$ npm install ng-ngen
+$ npm install ngen-ng
 ```
-After ngen is installed, at an ngen.config.js file to the root of your project. This is where you can define per project configuration, and where you add generators to your project. Here is the simplest version of the config, with one generator installed:
+The ngen-ng Angular generator is available here: https://github.com/jamesmfriedman/ngen-ng
+
+After nGen is installed, add an ngen.config.js file to the root of your project. This is where you can define per project configuration, and where you add generators to your project. Here is the simplest version of the config, with one generator installed:
 
 ```javascript
 module.exports = {
@@ -25,7 +27,7 @@ module.exports = {
 ```
 
 ## How it works
-Ngen takes a generator spec (a directory) and copies all of its contents to the appropriate locations in your project. The files and file names are processed by Ngen with a configuration object containing templated variables and names. Example Spec and example [name].js file:
+nGen takes a generator spec (a directory) and copies all of its contents to the appropriate locations in your project. The files and file names are processed by nGen with a configuration object containing templated variables and names. Example Spec and example [name].js file:
 ```
 // example spec
 +-- directive
@@ -68,7 +70,7 @@ angular.module('app').directive('helloWorld', function() {
 ```
 
 ## Usage
-Ngen is a command line tool that takes in a set of parameters.
+nGen is a command line tool that takes in a set of parameters.
 ```shell
 $ ngen optionalPackageName:generator componentName
 ```
@@ -81,15 +83,15 @@ This will generate a new directive using the 'directive' generator and give it a
 $ ngen directive mainNav
 ```
 ### Configure to Your Heart's Desire
-When Ngen runs, it builds a configuration object that gets passed into all of the generator's files as template variables. Configuration variables are honored in the following order:
+When nGen runs, it builds a configuration object that gets passed into all of the generator's files as template variables. Configuration variables are honored in the following order:
 
 - any inline command line args
 - the project's ngen.config.js file
 - the generator's ngen.config.js file
 - the generator package's ngen.config.js file
-- the standard Ngen config.
+- the standard nGen config.
 
-When running Ngen, the configuration object that gets passed to your templates will be logged in your terminal so theres no guessing as to what values are getting processed. In addition to the templates, file names can use any variables present in your configuration using dot notation. Example, a file named [module].js will be replaced with a configuration variable {'module': 'foo'}. The name you pass into the command line will be available in the name property converted into camelCase, PascalCase, snake_case, param-case, CONSTANT_CASE, and dot.case. In your template just access it accordingly (name.camelCase, name.pascalCase). Again, the same options are available to your file names, so you can name your files or directories things like [name]/[name.camelCase].js.
+The configuration object that gets passed to your templates will be logged in your terminal so theres no guessing as to what values are getting processed. In addition to the templates, file names can use any variables present in your configuration using dot notation. Example, a file named `[module].js` will be converted to `foo.js` when there is a configuration variable {'module': 'foo'}. The name you pass into the command line will be available in the name property converted into camelCase, PascalCase, snake_case, param-case, CONSTANT_CASE, and dot.case. In your template just access it accordingly (name.camelCase, name.pascalCase). Again, the same options are available to your file names, so you can name your files or directories things like [name]/[name.camelCase].js.
 
 ### Sample Config
 Make a file called `ngen.config.js` in the main directory of your project. The only required configuration parameter is _.generators.
@@ -97,7 +99,7 @@ Make a file called `ngen.config.js` in the main directory of your project. The o
 ```javascript
 module.exports = {
 	
-	- : { // the underscore is for global Ngen configuration options, here so they don't conflict with your params
+	- : { // the underscore is for global nGen configuration options, here so they don't conflict with your params
 		generators: [require('ngen-ng')] // require as many generator packages as your want.
 		ignore: ['.DS_Store', 'ngen.config.js'] // array of filenames to ignore when copying scaffolding. This is the default.
 	},
@@ -147,13 +149,13 @@ $ ngen directive helloWorld --module foo --publicPath /static/
 ```
 
 ## Creating your own Generators.
-Since no one can know exactly how you do things, you're probably going to want to make your own generators. Luckily it's as easy as running ngen.
+Since no one can know exactly how you do things, you're probably going to want to make your own generators. Luckily it's as easy as running nGen.
 
 1. Make sure `ngen` is installed and available
 2. In your project's root, run `ngen newGenerator yourGeneratorPackageName`
 3. Your generator is now avilable in your node_modules folder and can be accessed by using require('ngen-yourGeneratorPackageName') from your config.
 
-Check it out in your node_modules folder, you should have something like this
+Check it out in your `node_modules` folder, you should see something like this:
 ```
 +-- ngen-yourGeneratorPackageName
 |	+-- index.js
@@ -161,3 +163,6 @@ Check it out in your node_modules folder, you should have something like this
 | 	+-- ngen.config.js //optional config for your whole package
 |	+-- sampleGenerator
 |	|	+-- index.html
+```
+
+From here, just start adding your own generators to your new package.
