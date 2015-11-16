@@ -1,6 +1,6 @@
-# Ngen
+# nGen
 
-Ngen is here to be better way to scaffold. Why? Other scaffolding generators are too opinionated or try to do too much. Even with a bunch of prebuilt generators, lets face it: you or your team do things your own way. Define your own reusable scaffolds and template individual files, whole directories, or even entire projects.
+nGen is here to be better way to scaffold. Why? Other scaffolding generators are too opinionated or try to do too much. Even with a bunch of prebuilt generators, lets face it: you or your team do things your own way. Define your own reusable scaffolds and template individual files, whole directories, or even entire projects.
 
 ## Installation
 
@@ -10,8 +10,10 @@ $ npm install git@github.com:jamesmfriedman/ngen.git
 ```
 Generators are easy to make and add to your project. You'll probably want to define your own generators, but if you see one that meets your needs, install it to your project or global node_modules directory.
 ```shell
-$ npm install ng-ngen
+$ npm install ngen-ng
 ```
+The ngen-ng Angular generator is available here: https://github.com/jamesmfriedman/ngen-ng
+
 After ngen is installed, at an ngen.config.js file to the root of your project. This is where you can define per project configuration, and where you add generators to your project. Here is the simplest version of the config, with one generator installed:
 
 ```javascript
