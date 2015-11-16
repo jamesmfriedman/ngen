@@ -187,8 +187,7 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 	
 	this.buildConfig = function() {
 		// create our config, merge it with the user config for this specific type
-		var packageConfigPath = path.join(this.package.dir, 'ngen.config.js');
-		var generaterConfigPath = path.join(this.spec, '../..', 'ngen.config.js');
+		var packageConfigPath = path.join(this.package.dir, '../', 'ngen.config.js');
 		var nameCases = [
 			'', //needed for the raw name
 			'camelCase', 
@@ -217,17 +216,13 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		}
 		
 		
-		var generatorConfig = {};
-		if (fs.existsSync(generaterConfigPath)) {
-			generatorConfig = require(generaterConfigPath);
-		}
-
 		var packageGeneratorConfig = {};
 		if (fs.existsSync(packageConfigPath)) {
 			var packageConfig = require(packageConfigPath);
 			if ('*' in packageConfig) {
 				packageGeneratorConfig = merge.recursive(true, packageGeneratorConfig, packageConfig['*']);
 			}
+
 			packageGeneratorConfig = merge.recursive(true, packageGeneratorConfig, (this.type in packageConfig ? packageConfig[this.type] : {} ));
 		}
 
@@ -248,7 +243,7 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 			}
 		});
 
-		var conf = merge.recursive(true, standardConfig, packageGeneratorConfig, generatorConfig, userGeneratorConfig, inlineConfig);
+		var conf = merge.recursive(true, standardConfig, packageGeneratorConfig, userGeneratorConfig, inlineConfig);
 		console.log('');
 		console.log('Generator Config:');
 		console.log(JSON.stringify(conf, null, 4));
