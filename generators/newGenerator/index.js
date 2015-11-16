@@ -1,0 +1,1 @@
+module.exports = {name:'<%= name.raw %>', dir: __dirname};

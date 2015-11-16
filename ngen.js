@@ -83,8 +83,8 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 					wrench.rmdirSyncRecursive(newF);
 				}
 				
-				fs.mkdirSync(newF);
-
+				wrench.mkdirSyncRecursive(newF);
+				console.log('Gen dir: ' + newF);
 				dirCount++;
 			} else {
 				var tmpl = fs.readFileSync(specF, 'utf8');
@@ -100,6 +100,7 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		  		
 		  		var fd = fs.openSync(newF, 'w');
 		  		fs.writeFileSync(newF, rendered);
+		  		console.log('Gen file: ' + newF);
 		  		fileCount++;
 			}
 		});
@@ -161,18 +162,18 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		var newPath;
 		
 		// this type of file goes somewhere
-		if (typeof this.config.path == 'object' && ext in this.config.path) {
-			newPath = path.join(this.cwd, this.config.path[ext], f);
+		if (typeof this.config._.path == 'object' && ext in this.config._.path) {
+			newPath = path.join(this.cwd, this.config._.path[ext], f);
 		} 
 
 		// catch all in path
-		else if (typeof this.config.path == 'object' && '*' in this.config.path) {
-			newPath = path.join(this.cwd, this.config.path['*'], f);
+		else if (typeof this.config._.path == 'object' && '*' in this.config._.path) {
+			newPath = path.join(this.cwd, this.config._.path['*'], f);
 		}
 
 		// this component goes somewhere
-		else if (typeof this.config.path == 'string') {
-			newPath = path.join(this.cwd, this.config.path, f);
+		else if (typeof this.config._.path == 'string') {
+			newPath = path.join(this.cwd, this.config._.path, f);
 		}
 
 		// standard path
@@ -221,9 +222,10 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 			generatorConfig = require(generaterConfigPath);
 		}
 
-		var packageConfig = {};
+		var packageGeneratorConfig = {};
 		if (fs.existsSync(packageConfigPath)) {
-			packageConfig = require(packageConfigPath);
+			var packageConfig = require(packageConfigPath);
+			packageGeneratorConfig = merge.recursive(true, packageGeneratorConfig, (this.type in packageConfig ? packageConfig[this.type] : {} ));
 		}
 
 		var standardConfig = {
@@ -243,7 +245,7 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 			}
 		});
 
-		var conf = merge.recursive(true, standardConfig, packageConfig, generatorConfig, userGeneratorConfig, inlineConfig);
+		var conf = merge.recursive(true, standardConfig, packageGeneratorConfig, generatorConfig, userGeneratorConfig, inlineConfig);
 		console.log('');
 		console.log('Generator Config:');
 		console.log(JSON.stringify(conf, null, 4));
@@ -268,7 +270,9 @@ var Package = function(dir, name) {
 
 var UserConfig = function() {
 	var userConfigPath = path.join(process.cwd(), 'ngen.config.js');
-	var userConfig = {};
+	var userConfig = {
+		_: {generators: []}
+	};
 
 	if (fs.existsSync(userConfigPath)) {
 		userConfig = require(userConfigPath);
@@ -298,6 +302,7 @@ function init() {
 	delete commandLineConfig._;
 	
 	// add user generators
+	userConfig._.generators.push({name: 'ngen', dir: __dirname});
 	var packages = userConfig._.generators.map(function(f){
 		return new Package(f.dir, f.name);
 	}).filter(function(p){
@@ -342,7 +347,11 @@ function init() {
 		console.log('No generators found for "' + generatorType + '"!');
 		console.log('Installed Generators:');
 		userConfig._.generators.forEach(function(p){
+			p = new Package(p.dir, p.name);
 			console.log('\t' + p.name + ': ' + p.dir);
+			p.generators.forEach(function(g){
+				console.log('\t\t' + g);
+			});
 		});
 		console.log('');
 	}
