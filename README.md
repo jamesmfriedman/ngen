@@ -155,7 +155,7 @@ Since no one can know exactly how you do things, you're probably going to want t
 2. In your project's root, run `ngen newGenerator yourGeneratorPackageName`
 3. Your generator is now avilable in your node_modules folder and can be accessed by using require('ngen-yourGeneratorPackageName') from your config.
 
-Check it out in your node_modules folder, you should have something like this
+Check it out in your `node_modules` folder, you should see something like this:
 ```
 +-- ngen-yourGeneratorPackageName
 |	+-- index.js
@@ -163,3 +163,6 @@ Check it out in your node_modules folder, you should have something like this
 | 	+-- ngen.config.js //optional config for your whole package
 |	+-- sampleGenerator
 |	|	+-- index.html
+```
+
+From here, just start adding your own generators to your new package.
