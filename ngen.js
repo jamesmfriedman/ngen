@@ -225,6 +225,9 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		var packageGeneratorConfig = {};
 		if (fs.existsSync(packageConfigPath)) {
 			var packageConfig = require(packageConfigPath);
+			if ('*' in packageConfig) {
+				packageGeneratorConfig = merge.recursive(true, packageGeneratorConfig, packageConfig['*']);
+			}
 			packageGeneratorConfig = merge.recursive(true, packageGeneratorConfig, (this.type in packageConfig ? packageConfig[this.type] : {} ));
 		}
 
