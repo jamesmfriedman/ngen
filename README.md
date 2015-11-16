@@ -6,7 +6,7 @@ nGen is here to be better way to scaffold. Why? Other scaffolding generators are
 
 Currently waiting to submit to npm, so for the time being:
 ```shell
-$ npm install git@github.com:jamesmfriedman/ngen.git
+$ npm install https://github.com/jamesmfriedman/ngen.git
 ```
 Generators are easy to make and add to your project. You'll probably want to define your own generators, but if you see one that meets your needs, install it to your project or global node_modules directory.
 ```shell
