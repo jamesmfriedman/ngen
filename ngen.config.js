@@ -7,7 +7,7 @@ module.exports = {
 		}
 	},
 
-	newGenerator : {
+	init : {
 		_ : {
 			ignore: ['.DS_Store'],
 			createDir: false,

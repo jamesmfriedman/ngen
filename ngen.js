@@ -2,6 +2,7 @@
 
 var fs = require("fs");
 var path = require('path');
+var childProcess = require('child_process')
 
 var ejs = require('ejs');
 var wrench = require('wrench');
@@ -279,6 +280,38 @@ var UserConfig = function() {
 	return userConfig;
 };
 
+function getPackages(conf) {
+	var packages = [
+		{name: 'ngen', dir: __dirname}
+	];
+
+	var installedPackagesFile = path.join(process.cwd(), 'ngenInstalledPackages.js');
+	if (fs.existsSync(installedPackagesFile)) {
+		require(installedPackagesFile).forEach(function(f){
+			packages.push(require(f));
+		});
+	}
+	var prefix = childProcess.execSync('npm config get prefix').toString().replace(/\r?\n|\r/g, '');
+	var localPrefix = childProcess.execSync('npm bin').toString().replace(/\r?\n|\r/g, '');
+	var nodePaths = [
+		path.join(prefix, 'lib', 'node_modules'), // unix
+		path.join(prefix, 'node_modules'), // windows
+		path.dirname(localPrefix) // local modules
+	];
+
+	nodePaths.forEach(function(p){
+		if (!fs.existsSync(p)) return;
+		
+		fs.readdirSync(p).forEach(function(f){
+			if (f.search('ngen-') === 0) {
+				packages.push(require( path.join(p,f) ));
+			}
+		});
+	});
+	
+	return packages;
+};
+
 function init() {
 
 	// some base args from the command line
@@ -298,10 +331,9 @@ function init() {
 	var userConfig = new UserConfig();
 	var commandLineConfig = require('minimist')(process.argv.slice(2)); // get another copy because we're going to edit this one
 	delete commandLineConfig._;
-	
+
 	// add user generators
-	userConfig._.generators.push({name: 'ngen', dir: __dirname});
-	var packages = userConfig._.generators.map(function(f){
+	var packages = getPackages(userConfig).map(function(f){
 		return new Package(f.dir, f.name);
 	}).filter(function(p){
 		// filter out other packages if a chosen one was specified
@@ -335,7 +367,6 @@ function init() {
 			var generatorPackage = packages[num];
 			var generator = new Generator(generatorPackage, generatorType, generatorName, extraPath, userConfig, commandLineConfig);
 			generator.generate();
-			
 		});
 	} 
 
