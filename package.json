@@ -7,10 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "James Friedman",
+  "repository": "https://github.com/jamesmfriedman/ngen/",
   "license": "ISC",
   "dependencies": {
     "change-case": "^2.3.0",
     "ejs": "^2.3.4",
+    "isbinaryfile": "^3.0.0",
     "merge": "^1.2.0",
     "minimist": "^1.2.0",
     "prompt": "^0.2.14",
@@ -18,5 +20,9 @@
   },
   "bin": {
     "ngen": "ngen.js"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4"
   }
 }
