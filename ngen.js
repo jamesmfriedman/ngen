@@ -4,6 +4,8 @@ var fs = require("fs");
 var path = require('path');
 var childProcess = require('child_process')
 
+var isBinaryFile = require('./bin/isBinaryFile');
+
 var ejs = require('ejs');
 var wrench = require('wrench');
 var changeCase = require('change-case')
@@ -85,23 +87,35 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 				}
 				
 				wrench.mkdirSyncRecursive(newF);
-				console.log('Gen dir: ' + newF);
+				console.log('nGen dir: ' + newF);
 				dirCount++;
 			} else {
-				var tmpl = fs.readFileSync(specF, 'utf8');
-				var rendered = ejs.render(tmpl, that.config);
-				lineCount += rendered.split('\n').length
 
-				// create the dirs if we need them
-				wrench.mkdirSyncRecursive(path.dirname(newF), 0777);
+				if (isBinaryFile.sync(specF)) {
+					fs.createReadStream(specF).pipe(fs.createWriteStream(newF));
+					console.log('nGen file copy: ' + newF);
+				} else {
+					var rendered = fs.readFileSync(specF, 'utf8');
+					try {
+						rendered = ejs.render(rendered, that.config);	
+					} catch(e) {
+						console.log(e);
+					}
+					
+					// create the dirs if we need them
+					wrench.mkdirSyncRecursive(path.dirname(newF), 0777);
 
-				if (fs.existsSync(newF)) {
-					fs.unlinkSync(newF);
+					if (fs.existsSync(newF)) {
+						fs.unlinkSync(newF);
+					}
+			  		
+			  		var fd = fs.openSync(newF, 'w');
+			  		fs.writeFileSync(newF, rendered);
+					
+					lineCount += rendered.split('\n').length
+					console.log('nGen file: ' + newF);
 				}
-		  		
-		  		var fd = fs.openSync(newF, 'w');
-		  		fs.writeFileSync(newF, rendered);
-		  		console.log('Gen file: ' + newF);
+				
 		  		fileCount++;
 			}
 		});
@@ -248,6 +262,7 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 		console.log('');
 		console.log('Generator Config:');
 		console.log(JSON.stringify(conf, null, 4));
+		console.log('');
 		
 		return conf;
 	}
