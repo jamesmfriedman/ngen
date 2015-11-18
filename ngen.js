@@ -273,7 +273,13 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 var Package = function(dir) {
 	var that = this;	
 	this.name = path.basename(dir).split('ngen-').pop()
+	
+	if (fs.lstatSync(dir).isSymbolicLink()) {
+		dir = fs.readlinkSync(dir);
+	}
+
 	this.dir = path.join(dir, 'generators');
+	console.log(this.dir);
 
 	this.generators = fs.readdirSync(this.dir).filter(function(f){
 		if (fs.statSync(path.join(that.dir, f)).isDirectory()) {
@@ -316,6 +322,8 @@ function getPackages(conf) {
 
 	nodePaths.forEach(function(p){
 		if (!fs.existsSync(p)) return;
+
+		p = fs.realpathSync(p);
 		
 		fs.readdirSync(p).forEach(function(f){
 			if (f.search('ngen-') === 0) {
@@ -368,7 +376,7 @@ function init() {
 		prompt.start()
 		var promptText = '\n\nMultiple packages found containing generator "'+ generatorType +'":\n';
 		packages.forEach(function(p, i){
-			promptText += '\t' + (i + 1) + ') ' + p.name + '\n'
+			promptText += '\t' + (i + 1) + ') ' + p.name + ': ' + p.dir + '\n'
 		});
 
 		promptText += '\n\nPlease choose a package (1)';
