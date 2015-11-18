@@ -270,9 +270,9 @@ var Generator = function(generatorPackage, generatorType, generatorName, extraPa
 	this.init();	
 };
 
-var Package = function(dir, name) {
-	var that = this;
-	this.name = name || path.basename(dir);
+var Package = function(dir) {
+	var that = this;	
+	this.name = path.basename(dir).split('ngen-').pop()
 	this.dir = path.join(dir, 'generators');
 
 	this.generators = fs.readdirSync(this.dir).filter(function(f){
@@ -297,13 +297,13 @@ var UserConfig = function() {
 
 function getPackages(conf) {
 	var packages = [
-		{name: 'ngen', dir: __dirname}
+		__dirname
 	];
 
 	var installedPackagesFile = path.join(process.cwd(), 'ngenInstalledPackages.js');
 	if (fs.existsSync(installedPackagesFile)) {
 		require(installedPackagesFile).forEach(function(f){
-			packages.push(require(f));
+			packages.push(f);
 		});
 	}
 	var prefix = childProcess.execSync('npm config get prefix').toString().replace(/\r?\n|\r/g, '');
@@ -319,9 +319,13 @@ function getPackages(conf) {
 		
 		fs.readdirSync(p).forEach(function(f){
 			if (f.search('ngen-') === 0) {
-				packages.push(require( path.join(p,f) ));
+				packages.push(path.join(p,f));
 			}
 		});
+	});
+
+	packages = packages.map(function(p){
+		return new Package(p);
 	});
 	
 	return packages;
@@ -348,9 +352,7 @@ function init() {
 	delete commandLineConfig._;
 
 	// add user generators
-	var packages = getPackages(userConfig).map(function(f){
-		return new Package(f.dir, f.name);
-	}).filter(function(p){
+	var packages = getPackages(userConfig).filter(function(p){
 		// filter out other packages if a chosen one was specified
 		if (chosenPackage !== null ? p.name == chosenPackage : true) {
 			return p.generators.indexOf(generatorType) != -1;
@@ -390,8 +392,7 @@ function init() {
 		console.log('');
 		console.log('No generators found for "' + generatorType + '"!');
 		console.log('Installed Generators:');
-		userConfig._.generators.forEach(function(p){
-			p = new Package(p.dir, p.name);
+		getPackages().forEach(function(p){
 			console.log('\t' + p.name + ': ' + p.dir);
 			p.generators.forEach(function(g){
 				console.log('\t\t' + g);
