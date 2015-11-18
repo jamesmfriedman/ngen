@@ -7,11 +7,19 @@ module.exports = {
 		}
 	},
 
+	'*': {
+		ngenStarTest: 'packageConfig'
+	},
+
 	init : {
 		_ : {
 			ignore: ['.DS_Store'],
 			createDir: false,
 			path : 'node_modules/ngen-[name]/'	
 		},
+	},
+
+	ngenTestGenerator: {
+		ngenTestVar: 'packageConfig'
 	}
 }
