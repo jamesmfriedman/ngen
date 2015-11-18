@@ -18,21 +18,27 @@ describe('new Generator()', function(){
 		generator = new Generator(packages[0], 'init', 'helloWorldTest', null, new UserConfig(), {});
 	})
 
- 	it('Should init.', function(){
- 		expect(generator).to.be.an('object');
- 	});
+	describe('.init()', function(){
+	 	it('Should work.', function(){
+	 		expect(generator).to.be.an('object');
+	 	});
+	});
 
- 	it('Should generate.', function(){
- 		generator.generate();
- 		var dir = path.join(process.cwd(),'node_modules', 'ngen-helloWorldTest');
- 		expect( fs.existsSync(dir) ).to.be.true;
- 		wrench.rmdirSyncRecursive(dir);
- 	});
+	describe('.generate()', function(){
+	 	it('Should generate init generator scaffold in node_modules.', function(){
+	 		generator.generate();
+	 		var dir = path.join(process.cwd(),'node_modules', 'ngen-helloWorldTest');
+	 		expect( fs.existsSync(dir) ).to.be.true;
+	 		wrench.rmdirSyncRecursive(dir);
+	 	});
+	});
 
- 	it('Should detect conflicts.', function(){
- 		generator.generate();
- 		var dir = path.join(process.cwd(),'node_modules', 'ngen-helloWorldTest');
- 		expect(generator.testGen()).to.have.length.above(0);
- 		wrench.rmdirSyncRecursive(dir);
- 	});
+	describe('.testGen()', function(){
+	 	it('Should detect conflicts.', function(){
+	 		generator.generate();
+	 		var dir = path.join(process.cwd(),'node_modules', 'ngen-helloWorldTest');
+	 		expect(generator.testGen()).to.have.length.above(0);
+	 		wrench.rmdirSyncRecursive(dir);
+	 	});
+	});
 });
