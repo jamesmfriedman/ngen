@@ -14,18 +14,6 @@ $ npm install ngen-ng
 ```
 The ngen-ng Angular generator is available here: https://github.com/jamesmfriedman/ngen-ng
 
-After nGen is installed, run `ngen newConfig new` in root of your project. This will create an `ngen.config.js` where you can define per project configuration and add generators to your project. Here is the simplest version of the config, with one generator installed:
-
-```javascript
-module.exports = {
-	_ : {
-		generators: [
-			require('ngen-ng')	
-		]
-	}
-}
-```
-
 ## How it works
 nGen takes a generator spec (a directory) and copies all of its contents to the appropriate locations in your project. The files and file names are processed by nGen with a configuration object containing templated variables and names. Example Spec and example [name].js file:
 ```
@@ -87,7 +75,6 @@ When nGen runs, it builds a configuration object that gets passed into all of th
 
 - any inline command line args
 - the project's ngen.config.js file
-- the generator's ngen.config.js file
 - the generator package's ngen.config.js file
 - the standard nGen config.
 
@@ -100,7 +87,6 @@ Make a file called `ngen.config.js` in the main directory of your project. The o
 module.exports = {
 	
 	- : { // the underscore is for global nGen configuration options, here so they don't conflict with your params
-		generators: [require('ngen-ng')] // require as many generator packages as your want.
 		ignore: ['.DS_Store', 'ngen.config.js'] // array of filenames to ignore when copying scaffolding. This is the default.
 	},
 	
@@ -152,14 +138,15 @@ $ ngen directive helloWorld --module foo --publicPath /static/
 Since no one can know exactly how you do things, you're probably going to want to make your own generators. Luckily it's as easy as running nGen.
 
 1. Make sure `ngen` is installed and available
-2. In your project's root, run `ngen newGenerator yourGeneratorPackageName`
-3. Your generator is now avilable in your node_modules folder and can be accessed by using require('ngen-yourGeneratorPackageName') from your config.
+2. In your project's root, run `ngen init yourGeneratorPackageName`
+3. Your generator is now avilable in your node_modules folder and can be accessed `ngen` from the command line.
 
 Check it out in your `node_modules` folder, you should see something like this:
 ```
 +-- ngen-yourGeneratorPackageName
 |	+-- index.js
 |	+-- generators
+|	+-- package.json
 | 	+-- ngen.config.js //optional config for your whole package
 |	+-- sampleGenerator
 |	|	+-- index.html
