@@ -2,12 +2,22 @@
   "name": "ngen",
   "version": "0.0.1",
   "description": "A non-opinionated scaffolding generator.",
+  "keywords": [
+    "ngen",
+    "generator",
+    "scaffolding",
+    "yeoman",
+    "yo"
+  ],
+  "author": "James Friedman",
   "main": "ngen.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "James Friedman",
-  "repository": "https://github.com/jamesmfriedman/ngen/",
+  "repository": { 
+      "type": "git",
+      "url": "https://github.com/jamesmfriedman/ngen/"
+  },
   "license": "ISC",
   "dependencies": {
     "change-case": "^2.3.0",
